@@ -2,7 +2,7 @@
   "name": "arc-ask-demo",
   "private": true,
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "ISC",
   "type": "module",
   "description": "Minimal demo app for the Ask the Source experience — shows how to wire @arcxp/ask-the-source-components (and the underlying SDK) into a React app.",
   "scripts": {

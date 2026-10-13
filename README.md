@@ -65,5 +65,5 @@ Point the demo at your Ask the Source deployment with these environment variable
 ---
 
 ## License
-Governed by the [Arc XP SDK License Agreement](LICENSE); use requires an active Arc XP subscription.
+[ISC](LICENSE).
 
