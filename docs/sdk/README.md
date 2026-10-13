@@ -1,6 +1,6 @@
-# @arcxp/ask-the-news-sdk
+# @arcxp/ask-the-source-sdk
 
-TypeScript SDK for the [Ask The News API](https://www.arcxp.com/) — submit natural-language questions against your Arc XP news corpus and receive AI-generated answers with cited articles.
+TypeScript SDK for the [Ask the Source API](https://www.arcxp.com/) — submit natural-language questions against your Arc XP news corpus and receive AI-generated answers with cited articles.
 
 Use this package if you need direct API access, are building a custom UI, or are working outside of React. If you want a ready-made React UI, see the [components package](../components/README.md) instead — it wraps this SDK.
 
@@ -8,10 +8,10 @@ Use this package if you need direct API access, are building a custom UI, or are
 
 ## Installation
 
-The package is published to GitHub Packages under the `@arcxp` scope. GitHub Packages requires authentication to install (a GitHub token with `read:packages`). See the [root README](../../README.md#installing-the-packages) for setup steps, then install:
+The package is published to the public npm registry under the `@arcxp` scope — no token or `.npmrc` setup needed:
 
 ```bash
-npm install @arcxp/ask-the-news-sdk
+npm install @arcxp/ask-the-source-sdk
 ```
 
 **Requires Node >= 22.**
@@ -20,12 +20,12 @@ The package ships as a self-contained bundle in both ESM and CommonJS formats, d
 
 ```ts
 // ESM
-import { createAskTheNewsClient } from "@arcxp/ask-the-news-sdk";
+import { createAskTheSourceClient } from "@arcxp/ask-the-source-sdk";
 ```
 
 ```js
 // CommonJS
-const { createAskTheNewsClient } = require("@arcxp/ask-the-news-sdk");
+const { createAskTheSourceClient } = require("@arcxp/ask-the-source-sdk");
 ```
 
 ---
@@ -35,9 +35,9 @@ const { createAskTheNewsClient } = require("@arcxp/ask-the-news-sdk");
 Create a client by passing your API base URL and site-scoped API key:
 
 ```ts
-import { createAskTheNewsClient } from "@arcxp/ask-the-news-sdk";
+import { createAskTheSourceClient } from "@arcxp/ask-the-source-sdk";
 
-const client = createAskTheNewsClient({
+const client = createAskTheSourceClient({
   // Format: https://{org}-config-{env}.api.arc-cdn.net/ask
   // where {env} is "sandbox" or "prod"
   baseUrl: "https://myorg-config-sandbox.api.arc-cdn.net/ask",
@@ -225,7 +225,7 @@ for (const question of data?.questions ?? []) {
 All request and response types are exported with the `Api` prefix, matching the OpenAPI schema names:
 
 ```ts
-import type { ApiQueryRequest, ApiQueryStreamEvent } from "@arcxp/ask-the-news-sdk";
+import type { ApiQueryRequest, ApiQueryStreamEvent } from "@arcxp/ask-the-source-sdk";
 ```
 
 The raw generated `components` / `operations` maps from the OpenAPI spec are also exported.

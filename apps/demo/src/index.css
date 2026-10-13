@@ -5,7 +5,7 @@
    scanning the installed package's built output here (instead of importing
    its prebuilt styles.css) keeps theme tokens defined once and avoids
    duplicate utility layers. */
-@source "../../../node_modules/@arcxp/ask-the-news-components/dist-lib";
+@source "../../../node_modules/@arcxp/ask-the-source-components/dist-lib";
 
 @custom-variant dark (&:is(.dark *));
 
