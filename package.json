@@ -1,12 +1,12 @@
 {
-  "name": "ask-the-news",
+  "name": "ask-the-source",
   "private": true,
   "version": "1.0.0",
   "description": "Documentation and demo newsroom app for the Arc XP Ask the Source experience",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arcxp/ask-the-news.git"
+    "url": "git+https://github.com/arcxp/ask-the-source.git"
   },
   "type": "module",
   "workspaces": [

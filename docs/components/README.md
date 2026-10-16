@@ -45,7 +45,7 @@ Everything below covers optional configuration and lower-level building blocks.
 
 ## Configuration — `<AskProvider>`
 
-`<AskProvider>` is required. Every exported component and hook must be rendered inside one. It supplies the API configuration to all child components through React context — no environment variables needed.
+`<AskProvider>` supplies the API configuration to all child components through React context — no environment variables needed. It is required for the full experience and for everything API-backed: every hook, and any component that talks to the API (`AskChat`, the views, question fetching, feedback posting). A few presentational components can render without one — see the note under [Composable views](#2-composable-views-and-inputs).
 
 | Prop | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -123,7 +123,7 @@ For teams who want to assemble the layout themselves:
 | `SuggestedQuestions` | Component | Standalone list of suggested/active questions with loading state (pairs with `useActiveQuestions`) |
 | `DiveDeeper` | Component | Popover mini-Ask experience: three recommended questions plus a streamed answer, fed by an `onAsk` callback you supply (returning an `AsyncIterable<DiveDeeperChunk>`). Exported alongside the `DiveDeeperChunk` and `DiveDeeperProps` types. |
 
-The ones that open a floating surface of their own — `AnswerCard`, `SearchInput`, `DiveDeeper` — work the same with or without an `<AskProvider>` above them, including inside a shadow root: each resolves its own portal container, and nesting one inside a provider is a no-op. Only the API-backed behavior (feedback posting, question fetching) needs the provider.
+The ones that open a floating surface of their own — `AnswerCard`, `SearchInput`, `DiveDeeper` — also render without an `<AskProvider>` above them, including inside a shadow root: each resolves its own portal container, and nesting one inside a provider duplicates nothing. What the provider still gates is the API-backed behavior: without one, `AnswerCard`'s feedback buttons stay purely presentational (nothing is posted) and question fetching isn't available. Display strings still follow the browser language, then English.
 
 ### 3. Hooks (headless building blocks)
 
@@ -213,10 +213,20 @@ One value covers both colour schemes; pass `light-dark(a, b)` if you want them t
 
 This is the only theming route that works through a shadow boundary, and it works identically in the light DOM. Everything outside the table above is internal: override those on `[data-arc-ask]` as shown before.
 
-**Dark mode:** the palette follows the standard [`color-scheme`](https://developer.mozilla.org/docs/Web/CSS/color-scheme) property, which the components inherit from your page:
+**Dark mode:** the palette follows the standard [`color-scheme`](https://developer.mozilla.org/docs/Web/CSS/color-scheme) property, which the components inherit from your page. Match it to however your page decides dark mode:
 
 ```css
-:root { color-scheme: light dark; }   /* or `dark`, or per-section */
+/* OS-driven: the components follow the system preference. Use this only if
+   your own theme variables also respond to the OS scheme (light-dark() or a
+   prefers-color-scheme media query) — otherwise the widget flips dark while
+   the rest of your page stays light. */
+:root { color-scheme: light dark; }
+
+/* Class-driven (what the demo app does): pin light as the default and flip
+   the property under your theme class, so the components switch exactly when
+   your page does. */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
 ```
 
 Every colour token is declared with `light-dark()`, so it flips with `color-scheme` and needs no class on our side. Override a specific value per mode the same way:
@@ -225,7 +235,7 @@ Every colour token is declared with `light-dark()`, so it flips with `color-sche
 [data-arc-ask] { --arc-ask-background: light-dark(#fff, #16181d); }
 ```
 
-If your page signals dark mode with a `.dark` class instead, that keeps working: a compat rule translates the class into `color-scheme: dark`. It exists for pages that shipped against earlier versions — prefer `color-scheme`.
+Even if you set no `color-scheme` at all, a page that signals dark mode with a `.dark` class keeps working: a compat rule translates the class into `color-scheme: dark`. It exists for pages that shipped against earlier versions — prefer declaring `color-scheme` yourself, as above.
 
 > **The class signal does not reach a shadow root.** The rule is `.dark [data-arc-ask]`, and your `.dark` sits on `<html>`, outside the root — a selector in the adopted stylesheet cannot see it, so the components stay light while your page goes dark. If you mount them in a shadow root, set `color-scheme` (it inherits straight through the boundary) instead of relying on the class.
 
