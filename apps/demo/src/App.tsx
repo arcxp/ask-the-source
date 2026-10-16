@@ -1,7 +1,7 @@
-import { AskProvider, AskChat } from "@arcxp/ask-the-news-components";
+import { AskProvider, AskChat } from "@arcxp/ask-the-source-components";
 
 function App() {
-    // Wire the components to the Ask The News API. `AskProvider` builds the SDK
+    // Wire the components to the Ask the Source API. `AskProvider` builds the SDK
     // client from this config and exposes it to every component/hook below it.
     return (
         <AskProvider

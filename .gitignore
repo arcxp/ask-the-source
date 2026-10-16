@@ -37,3 +37,5 @@ coverage/
 .devcontainer-logs/
 .devcontainer-exclude/
 .devcontainer-logs
+
+.devcontainer-exclude

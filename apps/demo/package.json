@@ -2,9 +2,9 @@
   "name": "arc-ask-demo",
   "private": true,
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "ISC",
   "type": "module",
-  "description": "Minimal demo app for the Ask the News experience — shows how to wire @arcxp/ask-the-news-components (and the underlying SDK) into a React app.",
+  "description": "Minimal demo app for the Ask the Source experience — shows how to wire @arcxp/ask-the-source-components (and the underlying SDK) into a React app.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@arcxp/ask-the-news-components": "^1.0.0",
+    "@arcxp/ask-the-source-components": "^2.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

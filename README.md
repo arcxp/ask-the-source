@@ -1,45 +1,34 @@
-# Ask The News
+# Ask the Source
 
-**Ask The News** is an Arc XP product that lets readers ask natural-language questions about your newsroom's content. It queries your Arc XP news corpus and returns AI-generated answers with cited articles, streamed in real time.
+**Ask the Source** is an Arc XP product that lets readers ask natural-language questions about your newsroom's content. It queries your Arc XP news corpus and returns AI-generated answers with cited articles, streamed in real time.
 
-This repository hosts documentation and a runnable demo app for two npm packages that integrate Ask The News into your application:
+This repository hosts documentation and a runnable demo app for two npm packages that integrate Ask the Source into your application:
 
 | Package | What it is |
 | --- | --- |
-| [`@arcxp/ask-the-news-sdk`](docs/sdk/README.md) | TypeScript SDK — direct API access (queries, SSE streaming, feedback, settings). Use this if you are building a custom UI or working outside of React. |
-| [`@arcxp/ask-the-news-components`](docs/components/README.md) | React component library built on the SDK — drop-in `<AskChat/>` plus composable views and hooks. Use this if you want a working UI with minimal setup. |
+| [`@arcxp/ask-the-source-sdk`](docs/sdk/README.md) | TypeScript SDK — direct API access (queries, SSE streaming, feedback, settings). Use this if you are building a custom UI or working outside of React. |
+| [`@arcxp/ask-the-source-components`](docs/components/README.md) | React component library built on the SDK — drop-in `<AskChat/>` plus composable views and hooks. Use this if you want a working UI with minimal setup. |
 
 ---
 
 ## Which package do I need?
 
-- **Building a React app and want a ready-made UI?** Install `@arcxp/ask-the-news-components`. It bundles the SDK and gives you a full chat experience in a few lines of JSX. [Get started with components.](docs/components/README.md)
-- **Building a custom UI, using a non-React framework, or need raw API access?** Install `@arcxp/ask-the-news-sdk`. It handles auth, request/response typing, and SSE streaming. [Get started with the SDK.](docs/sdk/README.md)
+- **Building a React app and want a ready-made UI?** Install `@arcxp/ask-the-source-components`. It bundles the SDK and gives you a full chat experience in a few lines of JSX. [Get started with components.](docs/components/README.md)
+- **Building a custom UI, using a non-React framework, or need raw API access?** Install `@arcxp/ask-the-source-sdk`. It handles auth, request/response typing, and SSE streaming. [Get started with the SDK.](docs/sdk/README.md)
 
 ---
 
 ## Installing the packages
 
-The packages are published to [GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry) under the `@arcxp` scope. GitHub Packages requires authentication even for public packages — anonymous installs will be rejected.
-
-**Step 1 — Get a GitHub token with `read:packages` scope.** You can create one at [github.com/settings/tokens](https://github.com/settings/tokens).
-
-**Step 2 — Add your `.npmrc`.** This tells npm to route `@arcxp` packages to GitHub Packages and authenticate with your token:
-
-```ini
-# .npmrc (project root or home directory)
-@arcxp:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NPM_GITHUB_TOKEN}
-```
-
-**Step 3 — Set the environment variable and install:**
+The packages are published to the public npm registry under the `@arcxp` scope — no token or `.npmrc` setup needed:
 
 ```bash
-export NPM_GITHUB_TOKEN=ghp_your_token_here
-npm install @arcxp/ask-the-news-components   # React UI (includes the SDK)
+npm install @arcxp/ask-the-source-components   # React UI (includes the SDK)
 # or
-npm install @arcxp/ask-the-news-sdk          # SDK only
+npm install @arcxp/ask-the-source-sdk          # SDK only
 ```
+
+> **Migrating from `@arcxp/ask-the-news-*`?** The `@arcxp/ask-the-news-sdk` and `@arcxp/ask-the-news-components` packages on GitHub Packages are deprecated. Install the `@arcxp/ask-the-source-*` packages above instead, and remove any `@arcxp:registry=https://npm.pkg.github.com` line from your `.npmrc` — otherwise npm keeps resolving `@arcxp` packages from GitHub Packages. The SDK factory is now `createAskTheSourceClient` (formerly `createAskTheNewsClient`).
 
 Both packages require **Node >= 22**.
 
@@ -58,14 +47,14 @@ Both packages require **Node >= 22**.
 
 [`apps/demo`](apps/demo) is a minimal demo app showing how the packages are wired together: a single page rendering `<AskProvider>` + `<AskChat/>`. It is dev-only and runs off the Vite dev server.
 
-**Prerequisites:** Node >= 22 and the `.npmrc` auth above (the repo's `.npmrc` reads `NPM_GITHUB_TOKEN` from your environment).
+**Prerequisites:** Node >= 22.
 
 ```bash
 npm install       # installs the demo and the published @arcxp packages
 npm run dev       # starts the demo on http://localhost:3000
 ```
 
-Point the demo at your Ask The News deployment with these environment variables (e.g. via `apps/demo/.env.local` or real environment variables):
+Point the demo at your Ask the Source deployment with these environment variables (e.g. via `apps/demo/.env.local` or real environment variables):
 
 | Variable | Description | Example |
 | --- | --- | --- |
@@ -76,5 +65,5 @@ Point the demo at your Ask The News deployment with these environment variables 
 ---
 
 ## License
-Governed by the [Arc XP SDK License Agreement](LICENSE); use requires an active Arc XP subscription.
+[ISC](LICENSE).
 

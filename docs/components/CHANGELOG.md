@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.0] - 2026-09-29
+
+### Changed
+- **Breaking — the package is renamed from `@arcxp/ask-the-news-components` to `@arcxp/ask-the-source-components`**, to match the product's new name, Ask the Source. The API is unchanged: replace the package name in your `package.json` and in every import, including the stylesheet (`import "@arcxp/ask-the-source-components/styles.css"`). It now depends on `@arcxp/ask-the-source-sdk` instead of `@arcxp/ask-the-news-sdk`. `@arcxp/ask-the-news-components` receives no further releases.
+- **Published to the public npm registry** instead of GitHub Packages. Installing no longer needs a GitHub token or an `@arcxp` entry in `.npmrc` — remove both.
+- **Licensed under ISC** (previously MIT). The package now ships its `LICENSE` file.
+
+## [2.3.0] - 2026-08-27
+
+### Added
+- **`locale` on `<AskProvider>` — the components render in the reader's language.** Pass a BCP 47 tag (`locale="es"`; only the base language is used, so `es-MX` resolves to `es`). When the prop is omitted or the language isn't shipped, the browser language applies, then English. Shipped languages: `ar`, `de`, `en`, `es`, `fr`, `ja`, `ko`, `pt`. Every user-visible string follows the locale, including screen-reader text (`aria-label`s, visually-hidden descriptions); the only English left is internal to the vendored shadcn primitives and the widget loader's floating launcher.
+- **Right-to-left layout.** Arabic renders RTL out of the box: every component root and floating surface (drawers, dialogs, tooltips, menus) carries a `dir` attribute resolved from the locale, and the layout uses logical CSS properties (`ms-*`, `pe-*`, `text-start`, …) instead of left/right ones. No host configuration is needed.
+- **Hydration-safe language resolution.** A server render and the hydration pass both resolve English; the browser language applies in a re-render right after hydration. Pass `locale` explicitly to get the final language in the server HTML.
+- New exports: `ASK_LOCALES` (the shipped language codes), `resolveAskLocale` and `getAskLocaleDirection` (the exact resolution the components use, for wrappers that mirror `lang`/`dir` onto their own document), and the types `AskLabels`, `AskLocale` and `AskDirection`.
+
+### Changed
+- The per-component string props that are functional knobs keep working and win over the locale: `placeholder` / `disclaimerText` on `SearchInput` / `SearchBox` and `loadingLabel` on `SuggestedQuestions`. When they are omitted, the default now comes from the locale instead of a hard-coded English string.
+
+### Removed
+- **Breaking — the `labels` prop on `AnswerCard`.** Its strings now come from the locale; individual strings are no longer overridable.
+- **The badge on `AskLandingView`** and its `.arc-ask-badge` styling hook. Remove any CSS that targets `.arc-ask-badge`.
+
 ## [2.2.0] - 2026-08-25
 
 ### Changed

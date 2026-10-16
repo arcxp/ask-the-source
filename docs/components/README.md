@@ -1,17 +1,17 @@
-# @arcxp/ask-the-news-components
+# @arcxp/ask-the-source-components
 
-React component library for [Ask The News](https://www.arcxp.com/) — drop a conversational, sources-backed news answering experience into any React app. Includes streaming AI answers, inline citations, and suggested follow-up questions.
+React component library for [Ask the Source](https://www.arcxp.com/) — drop a conversational, sources-backed news answering experience into any React app. Includes streaming AI answers, inline citations, and suggested follow-up questions.
 
-This package wraps the [`@arcxp/ask-the-news-sdk`](../sdk/README.md) — you do not need to install the SDK separately.
+This package wraps the [`@arcxp/ask-the-source-sdk`](../sdk/README.md) — you do not need to install the SDK separately.
 
 ---
 
 ## Installation
 
-The package is published to GitHub Packages under the `@arcxp` scope. GitHub Packages requires authentication to install (a GitHub token with `read:packages`). See the [root README](../../README.md#installing-the-packages) for setup steps, then install:
+The package is published to the public npm registry under the `@arcxp` scope — no token or `.npmrc` setup needed:
 
 ```bash
-npm install @arcxp/ask-the-news-components
+npm install @arcxp/ask-the-source-components
 ```
 
 **Requires Node >= 22, and React 18 or 19** (peer dependencies provided by your app, not bundled).
@@ -23,8 +23,8 @@ npm install @arcxp/ask-the-news-components
 Wrap your app (or the relevant section of it) in `<AskProvider>` and drop in `<AskChat />`. Import the stylesheet once, before your own stylesheets (so your CSS wins any conflict — see [Theming](#theming)):
 
 ```tsx
-import { AskProvider, AskChat } from "@arcxp/ask-the-news-components";
-import "@arcxp/ask-the-news-components/styles.css";
+import { AskProvider, AskChat } from "@arcxp/ask-the-source-components";
+import "@arcxp/ask-the-source-components/styles.css";
 
 export function App() {
   return (
@@ -53,6 +53,7 @@ Everything below covers optional configuration and lower-level building blocks.
 | `website` | `string` | Yes | Site identifier (e.g. `my-site`) |
 | `apiKey` | `string` | Yes | API key, sent as the `X-Api-Key` header |
 | `queryOptions` | `AskQueryOptions` | No | Default query options applied to every query sent under this provider (see below) |
+| `locale` | `string` | No | Language of the display strings the components render (see below) |
 
 ```tsx
 <AskProvider baseUrl={ARC_ASK_BASE_URL} apiKey={ARC_ASK_API_KEY} website="my-site">
@@ -77,6 +78,24 @@ Controls query behavior without dropping down to the SDK. Set it once on `<AskPr
 ```
 
 Overrides resolve per field: an experience-level `inlineCitations` or `filters` each replace the provider's value for that field independently (`filters` is replaced as a whole block, not deep-merged).
+
+### Display language — `locale`
+
+Every user-visible string the components render is fixed and brand-agnostic — individual strings are not overridable. What you pick is the language: pass a BCP 47 tag to `<AskProvider locale>` (only the base language is used, so `es-MX` resolves to `es`). When the prop is omitted or the language isn't shipped, the browser language applies, then English.
+
+```tsx
+<AskProvider baseUrl={ARC_ASK_BASE_URL} apiKey={ARC_ASK_API_KEY} website="my-site" locale="es">
+```
+
+Shipped languages (exported as `ASK_LOCALES`): `ar`, `de`, `en`, `es`, `fr`, `ja`, `ko`, `pt`. The strings live in one JSON file per language under `src/locales/`, all sharing the key set described by the exported `AskLabels` type (greeting, tagline, input placeholders, AI disclaimer, loading messages, section headings, and the rejected/unanswered/error notices).
+
+The narrow per-component props still exist for the strings that are functional knobs rather than copy: `placeholder` / `disclaimerText` on `SearchInput`/`SearchBox` (pass `""` to hide the disclaimer) and `loadingLabel` on `SuggestedQuestions` — each wins over the locale's string.
+
+**Right-to-left:** Arabic renders RTL out of the box — every component root and floating surface (drawers, tooltips, menus) carries a `dir` attribute resolved from the locale, and the layout uses logical CSS properties, so no host configuration is needed.
+
+**Accessible names:** screen-reader strings (`aria-label`s, visually-hidden descriptions) follow the locale too. The only remaining English strings are internal to the vendored shadcn primitives and the widget loader's floating launcher (which is dependency-free by design).
+
+**Server-side rendering:** the browser-language fallback is hydration-safe. A server render and the hydration pass both resolve English; the viewer's browser language applies in a re-render immediately after hydration. If you SSR and want the final language in the server HTML (no post-hydration text swap), pass `locale` explicitly.
 
 ---
 
@@ -104,7 +123,7 @@ For teams who want to assemble the layout themselves:
 | `SuggestedQuestions` | Component | Standalone list of suggested/active questions with loading state (pairs with `useActiveQuestions`) |
 | `DiveDeeper` | Component | Popover mini-Ask experience: three recommended questions plus a streamed answer, fed by an `onAsk` callback you supply (returning an `AsyncIterable<DiveDeeperChunk>`). Exported alongside the `DiveDeeperChunk` and `DiveDeeperProps` types. |
 
-The ones that open a floating surface of their own — `AnswerCard`, `SearchInput`, `DiveDeeper` — also render without an `<AskProvider>` above them, including inside a shadow root: portal-container resolution is provider-independent (each resolves its own, and nesting one inside a provider duplicates nothing). What the provider still gates is the API-backed behavior: without one, `AnswerCard`'s feedback buttons stay purely presentational (nothing is posted) and question fetching isn't available — and hooks always require it.
+The ones that open a floating surface of their own — `AnswerCard`, `SearchInput`, `DiveDeeper` — also render without an `<AskProvider>` above them, including inside a shadow root: each resolves its own portal container, and nesting one inside a provider duplicates nothing. What the provider still gates is the API-backed behavior: without one, `AnswerCard`'s feedback buttons stay purely presentational (nothing is posted) and question fetching isn't available. Display strings still follow the browser language, then English.
 
 ### 3. Hooks (headless building blocks)
 
@@ -124,6 +143,10 @@ For fully custom UIs that reuse the data and streaming logic without the built-i
 | `AskProvider` | Component | Context wrapper (see above) |
 | `useAskConfig` | Hook | Reads the config supplied by `<AskProvider>` from context |
 | `AskConfig`, `AskProviderProps`, `AskQueryOptions`, `AskQueryFilters` | Types | Shape of the config object, provider props, query options, and retrieval filters |
+| `AskLabels` | Type | Shape of one language's display strings (see "Display language — `locale`") |
+| `AskLocale`, `AskDirection` | Types | Union of the shipped language codes; `"ltr" \| "rtl"` |
+| `ASK_LOCALES` | Constant | The shipped language codes |
+| `resolveAskLocale`, `getAskLocaleDirection` | Functions | The exact locale/direction resolution the components use — for wrappers that mirror it onto their own document (`lang`/`dir`), like the iframe widget |
 
 ### Shared data types
 
@@ -262,7 +285,6 @@ Landing view:
 | `.arc-ask-landing` | landing view root (`<main>`) |
 | `.arc-ask-landing__greeting` | the time-of-day greeting heading |
 | `.arc-ask-landing__tagline` | the line under the greeting |
-| `.arc-ask-badge` | the "Ask the News" badge |
 | `.arc-ask-suggested-questions` | suggested-questions list (also its loading state) |
 | `.arc-ask-suggested-questions__item` | one suggested-question button |
 
@@ -347,15 +369,15 @@ One caveat applies when your app uses the same semantic utility classes this lib
 
 ```css
 /* your app stylesheet — no styles.css import in this mode */
-@source "../node_modules/@arcxp/ask-the-news-components/dist-lib";
+@source "../node_modules/@arcxp/ask-the-source-components/dist-lib";
 ```
 
 Your build then generates the utilities against your own tokens. In this mode you also have to supply, in your own stylesheet, everything the library's markup references but the class names don't carry:
 
-- **Tokens:** `--arc-ask-success`, `--arc-ask-background`, `--arc-ask-muted-foreground` (the last two are named directly by the shimmer placeholder, whose text colour *is* its `background-image` — leave them out and it renders invisible rather than unstyled), `--arc-ask-tab-bar-height`, `--arc-ask-bottom-chrome`, `--arc-ask-sticky-bar-pb`, and the derived tokens the markup names directly (`--arc-ask-ring-invalid`, `--arc-ask-destructive-surface`, `--arc-ask-destructive-surface-subtle`, `--arc-ask-outline-border`, `--arc-ask-outline-surface`, `--arc-ask-outline-surface-hover`, `--arc-ask-textarea-surface`, `--arc-ask-ghost-surface-hover`, `--arc-ask-media-surface`, `--arc-ask-edge-border`, `--arc-ask-edge-shadow-near`, `--arc-ask-edge-shadow-far`, `--arc-ask-edge-shadow-far-strong`). Copy them from [`src/index.css`](https://github.com/WPMedia/arc-ask-the-news-packages/blob/main/packages/components/src/index.css), both halves — the unconditional light values and the `@supports (color: light-dark(…))` block that adds the dark ones. Anything the markup references but your stylesheet doesn't declare is dropped silently. The host-tunable four (`--arc-ask-z-modal`, `--arc-ask-z-anchored`, `--arc-ask-answer-reserve`, `--arc-ask-ask-bar-height`) are the exception: they carry their defaults inline at each use site, so declare them only if you want different values.
+- **Tokens:** `--arc-ask-success`, `--arc-ask-background`, `--arc-ask-muted-foreground` (the last two are named directly by the shimmer placeholder, whose text colour *is* its `background-image` — leave them out and it renders invisible rather than unstyled), `--arc-ask-tab-bar-height`, `--arc-ask-bottom-chrome`, `--arc-ask-sticky-bar-pb`, and the derived tokens the markup names directly (`--arc-ask-ring-invalid`, `--arc-ask-destructive-surface`, `--arc-ask-destructive-surface-subtle`, `--arc-ask-outline-border`, `--arc-ask-outline-surface`, `--arc-ask-outline-surface-hover`, `--arc-ask-textarea-surface`, `--arc-ask-ghost-surface-hover`, `--arc-ask-media-surface`, `--arc-ask-edge-border`, `--arc-ask-edge-shadow-near`, `--arc-ask-edge-shadow-far`, `--arc-ask-edge-shadow-far-strong`). Copy them from the package's shipped stylesheet (`node_modules/@arcxp/ask-the-source-components/dist-lib/index.css`), both halves — the unconditional light values and the `@supports (color: light-dark(…))` block that adds the dark ones. Anything the markup references but your stylesheet doesn't declare is dropped silently. The host-tunable four (`--arc-ask-z-modal`, `--arc-ask-z-anchored`, `--arc-ask-answer-reserve`, `--arc-ask-ask-bar-height`) are the exception: they carry their defaults inline at each use site, so declare them only if you want different values.
 - **`color-scheme`:** declare it on your root (`color-scheme: light dark`) so the `light-dark()` palette resolves.
 - **Entrance animations:** `@import "tw-animate-css";` — the components use its `animate-in` / `fade-in` / `slide-in-from-*` utilities.
-- **Custom keyframes and utilities:** the `arc-ask-shimmer`, `arc-ask-feedback-bloom`, `arc-ask-feedback-ring` and `arc-ask-feedback-particle` `@keyframes`, plus the `arc-ask-shimmer` and `scrollbar-none` utilities. Copy them from [`src/index.css`](https://github.com/WPMedia/arc-ask-the-news-packages/blob/main/packages/components/src/index.css); without them the shimmer and the feedback celebration render static.
+- **Custom keyframes and utilities:** the `arc-ask-shimmer`, `arc-ask-feedback-bloom`, `arc-ask-feedback-ring` and `arc-ask-feedback-particle` `@keyframes`, plus the `arc-ask-shimmer` and `scrollbar-none` utilities. Copy them from the same shipped stylesheet; without them the shimmer and the feedback celebration render static.
 
 The demo app's [`src/index.css`](../../apps/demo/src/index.css) is a complete, working example of this mode.
 
@@ -363,6 +385,5 @@ The demo app's [`src/index.css`](../../apps/demo/src/index.css) is a complete, w
 
 ## Further reading
 
-- Measured limitations we have not fixed yet, with repros: [KNOWN-ISSUES.md](https://github.com/WPMedia/arc-ask-the-news-packages/blob/main/packages/components/KNOWN-ISSUES.md).
 - If you need raw API access or are working outside React, see the [SDK docs](../sdk/README.md).
 - For running the demo app, see the [root README](../../README.md#running-the-demo-app).
